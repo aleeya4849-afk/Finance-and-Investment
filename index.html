@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIPlayground - Browser AI Demos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 8px;
+        }
+
+        [data-theme="dark"] {
+            --text: #f9fafb;
+            --text-light: #d1d5db;
+            --bg: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --border: #4b5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 120px);
+            margin-top: 20px;
+        }
+
+        /* Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-right: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Demo Area */
+        .demo-area {
+            flex: 1;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .demo-container.active {
+            display: block;
+        }
+
+        .demo-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .demo-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Playground Controls */
+        .playground-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #e69500;
+            transform: translateY(-2px);
+        }
+
+        /* Text Generator Styles */
+        .text-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .text-output {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            min-height: 200px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-output.typing::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        .output-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Image Generator Styles */
+        .image-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Sound Synthesizer Styles */
+        .sound-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .visualizer-container {
+            width: 100%;
+            height: 200px;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .sound-controls-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Progress Animation */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: var(--border);
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Confetti Animation */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            opacity: 0.8;
+            border-radius: 50%;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .about-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .about-card h3 {
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .nav-list {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .nav-item {
+                flex-shrink: 0;
+            }
+
+            .text-controls, .image-controls, .sound-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">AI</div>
+                    <div class="logo-text">
+                        <h1>AIPlayground</h1>
+                        <p>Experiment with simulated AI models in your browser</p>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <nav class="sidebar">
+                <div class="nav-list">
+                    <div class="nav-item active" data-demo="text">
+                        <span class="nav-icon">📝</span>
+                        <span>Text Generator</span>
+                    </div>
+                    <div class="nav-item" data-demo="image">
+                        <span class="nav-icon">🎨</span>
+                        <span>Image Generator</span>
+                    </div>
+                    <div class="nav-item" data-demo="sound">
+                        <span class="nav-icon">🎵</span>
+                        <span>Sound Synthesizer</span>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="demo-area">
+                <!-- Text Generator Demo -->
+                <div class="demo-container active" id="textDemo">
+                    <div class="demo-header">
+                        <h2>Text Generator</h2>
+                        <p>Generate creative text using a simulated language model based on templates and Markov chains</p>
+                    </div>
+
+                    <div class="playground-controls">
+                        <button class="btn btn-primary" id="textGenerate">
+                            <span>Generate</span>
+                        </button>
+                        <button class="btn btn-secondary" id="textRandomize">
+                            <span>Randomize</span>
+                        </button>
+                        <button class="btn btn-secondary" id="textReset">
+                            <span>Reset</span>
+                        </button>
+                        <button class="btn btn-accent" id="textExport">
+                            <span>Export</span>
+                        </button>
+                    </div>
+
+                    <div class="text-controls">
+                        <div class="control-group">
+                            <label for="textPrompt">Prompt</label>
+                            <input type="text" id="textPrompt" placeholder="Enter a prompt or leave empty for random">
+                        </div>
+                        <div class="control-group">
+                            <label for="textLength">Length</label>
+                            <select id="textLength">
+                                <option value="short">Short (1-2 sentences)</option>
+                                <option value="medium" selected>Medium (3-5 sentences)</option>
+                                <option value="long">Long (6+ sentences)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="textTemperature">Temperature: <span id="tempValue">0.7</span></label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="1" step="0.1" value="0.7" class="slider" id="textTemperature">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="textStyle">Style</label>
+                            <select id="textStyle">
+                                <option value="creative">Creative</option>
+                                <option value="formal">Formal</option>
+                                <option value="poetic">Poetic</option>
+                                <option value="technical">Technical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="progress-container" id="textProgress">
+                        <div class="progress-bar"></div>
+                    </div>
+
+                    <div class="text-output" id="textOutput">
+                        Your generated text will appear here...
+                    </div>
+
+                    <div class="output-controls">
+                        <button class="btn btn-secondary" id="textCopy">
+                            <span>Copy to Clipboard</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Image Generator Demo -->
+                <div class="demo-container" id="imageDemo">
+                    <div class="demo-header">
+                        <h2>Image Generator</h2>
+                        <p>Create unique abstract art using procedural generation algorithms</p>
+                    </div>
+
+                    <div class="playground-controls">
+                        <button class="btn btn-primary" id="imageGenerate">
+                            <span>Generate</span>
+                        </button>
+                        <button class="btn btn-secondary" id="imageRandomize">
+                            <span>Randomize</span>
+                        </button>
+                        <button class="btn btn-secondary" id="imageReset">
+                            <span>Reset</span>
+                        </button>
+                        <button class="btn btn-accent" id="imageExport">
+                            <span>Export</span>
+                        </button>
+                    </div>
+
+                    <div class="image-controls">
+                        <div class="control-group">
+                            <label for="imageStyle">Style</label>
+                            <select id="imageStyle">
+                                <option value="abstract">Abstract Noise</option>
+                                <option value="flow">Line Flow</option>
+                                <option value="mosaic">Mosaic</option>
+                                <option value="particles">Particles</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="imageColors">Color Palette</label>
+                            <select id="imageColors">
+                                <option value="vibrant">Vibrant</option>
+                                <option value="pastel">Pastel</option>
+                                <option value="monochrome">Monochrome</option>
+                                <option value="earth">Earth Tones</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="imageComplexity">Complexity: <span id="complexityValue">5</span></label>
+                            <div class="slider-container">
+                                <input type="range" min="1" max="10" step="1" value="5" class="slider" id="imageComplexity">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="imageSeed">Seed (optional)</label>
+                            <input type="text" id="imageSeed" placeholder="Enter a seed for reproducibility">
+                        </div>
+                    </div>
+
+                    <div class="progress-container" id="imageProgress">
+                        <div class="progress-bar"></div>
+                    </div>
+
+                    <div class="canvas-container">
+                        <canvas id="imageCanvas" width="800" height="400"></canvas>
+                    </div>
+
+                    <div class="playground-controls">
+                        <button class="btn btn-secondary" id="imagePause">
+                            <span>Pause Animation</span>
+                        </button>
+                    </div>
+
+                    <div class="image-gallery" id="imageGallery">
+                        <!-- Gallery items will be added here -->
+                    </div>
+                </div>
+
+                <!-- Sound Synthesizer Demo -->
+                <div class="demo-container" id="soundDemo">
+                    <div class="demo-header">
+                        <h2>Sound Synthesizer</h2>
+                        <p>Generate musical sequences using algorithmic composition and Web Audio API</p>
+                    </div>
+
+                    <div class="playground-controls">
+                        <button class="btn btn-primary" id="soundGenerate">
+                            <span>Generate</span>
+                        </button>
+                        <button class="btn btn-secondary" id="soundRandomize">
+                            <span>Randomize</span>
+                        </button>
+                        <button class="btn btn-secondary" id="soundReset">
+                            <span>Reset</span>
+                        </button>
+                        <button class="btn btn-accent" id="soundExport">
+                            <span>Export</span>
+                        </button>
+                    </div>
+
+                    <div class="sound-controls">
+                        <div class="control-group">
+                            <label for="soundScale">Scale</label>
+                            <select id="soundScale">
+                                <option value="major">Major</option>
+                                <option value="minor">Minor</option>
+                                <option value="pentatonic">Pentatonic</option>
+                                <option value="chromatic">Chromatic</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="soundTempo">Tempo: <span id="tempoValue">120</span> BPM</label>
+                            <div class="slider-container">
+                                <input type="range" min="60" max="180" step="5" value="120" class="slider" id="soundTempo">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="soundWaveform">Waveform</label>
+                            <select id="soundWaveform">
+                                <option value="sine">Sine</option>
+                                <option value="square">Square</option>
+                                <option value="sawtooth">Sawtooth</option>
+                                <option value="triangle">Triangle</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="soundDuration">Duration: <span id="durationValue">8</span> bars</label>
+                            <div class="slider-container">
+                                <input type="range" min="2" max="16" step="2" value="8" class="slider" id="soundDuration">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container" id="soundProgress">
+                        <div class="progress-bar"></div>
+                    </div>
+
+                    <div class="visualizer-container">
+                        <canvas id="soundVisualizer" width="800" height="200"></canvas>
+                    </div>
+
+                    <div class="sound-controls-row">
+                        <button class="btn btn-primary" id="soundPlay">
+                            <span>Play</span>
+                        </button>
+                        <button class="btn btn-secondary" id="soundStop">
+                            <span>Stop</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <footer>
+        <div class="container">
+            <div class="about-card">
+                <h3>About AIPlayground</h3>
+                <p>This is an educational demonstration of simulated AI models running entirely in your browser. These are simplified implementations designed to illustrate concepts behind text generation, image creation, and sound synthesis.</p>
+                <p>All code is open source and available under the MIT license. Created for learning and experimentation purposes.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===========================================================================
+        // AIPlayground - Self-contained browser-based AI demo playground
+        // ===========================================================================
+        // This file contains all HTML, CSS, and JavaScript for the application.
+        // It runs entirely in the browser with no server required.
+        //
+        // The application includes three simulated "mini AI" demos:
+        // 1. Text Generator - Uses template-based generation with Markov chain elements
+        // 2. Image Generator - Creates abstract art using procedural generation
+        // 3. Sound Synthesizer - Generates music using Web Audio API and algorithmic composition
+        //
+        // All models are intentionally simplified for educational purposes and to run
+        // entirely client-side without external APIs.
+        // ===========================================================================
+
+        // Seeded pseudo-random number generator for reproducible results
+        class SeededRNG {
+            constructor(seed = null) {
+                this.seed = seed || Math.floor(Math.random() * 2**32);
+                this.state = this.seed;
+            }
+
+            // Linear Congruential Generator - simple but sufficient for our purposes
+            next() {
+                this.state = (this.state * 1664525 + 1013904223) % 2**32;
+                return this.state / 2**32;
+            }
+
+            // Reset to initial seed
+            reset() {
+                this.state = this.seed;
+            }
+
+            // Generate a number between min and max (inclusive)
+            randomBetween(min, max) {
+                return min + this.next() * (max - min);
+            }
+
+            // Pick a random element from an array
+            randomChoice(array) {
+                return array[Math.floor(this.next() * array.length)];
+            }
+
+            // Shuffle an array (Fisher-Yates algorithm)
+            shuffle(array) {
+                const result = [...array];
+                for (let i = result.length - 1; i > 0; i--) {
+                    const j = Math.floor(this.next() * (i + 1));
+                    [result[i], result[j]] = [result[j], result[i]];
+                }
+                return result;
+            }
+        }
+
+        // Global RNG instance
+        let rng = new SeededRNG();
+
+        // ===========================================================================
+        // UTILITY FUNCTIONS
+        // ===========================================================================
+
+        // Download helper functions
+        const downloadHelpers = {
+            // Download text as file
+            text: (content, filename) => {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'aiplayground-text.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            // Download canvas as PNG
+            canvas: (canvas, filename) => {
+                const url = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'aiplayground-image.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            },
+
+            // Download audio as WAV
+            audio: (audioBuffer, filename) => {
+                // For simplicity, we'll implement this in the sound synthesizer section
+                console.log('Audio export would be implemented here');
+                // In a full implementation, we would encode the audio buffer as WAV
+            }
+        };
+
+        // Show confetti animation
+        function showConfetti() {
+            const container = document.getElementById('confettiContainer');
+            container.style.display = 'block';
+            container.innerHTML = '';
+
+            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 3000);
+        }
+
+        // Animate progress bar
+        function animateProgress(progressId, duration, callback) {
+            const progressContainer = document.getElementById(progressId);
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            let startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                progressBar.style.width = `${progress * 100}%`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                        if (callback) callback();
+                    }, 300);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // Typewriter effect for text output
+        function typewriterEffect(element, text, speed = 30) {
+            element.classList.add('typing');
+            element.textContent = '';
+            
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.classList.remove('typing');
+                }
+            }
+            
+            type();
+        }
+
+        // ===========================================================================
+        // THEME MANAGEMENT
+        // ===========================================================================
+
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const savedTheme = localStorage.getItem('aiplayground-theme') || 'light';
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('aiplayground-theme', newTheme);
+                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+        }
+
+        // ===========================================================================
+        // NAVIGATION
+        // ===========================================================================
+
+        function initNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const demoContainers = document.querySelectorAll('.demo-container');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const demoId = item.getAttribute('data-demo');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Show corresponding demo
+                    demoContainers.forEach(container => {
+                        container.classList.remove('active');
+                        if (container.id === `${demoId}Demo`) {
+                            container.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // ===========================================================================
+        // TEXT GENERATOR
+        // ===========================================================================
+
+        // Sample text corpus for the text generator
+        // In a real implementation, this would be much larger and more diverse
+        const textCorpus = {
+            creative: [
+                "The stars whispered secrets to the midnight ocean.",
+                "A lone tree stood defiant against the howling wind.",
+                "Memories floated like autumn leaves in a stream of consciousness.",
+                "The city breathed with a rhythm all its own.",
+                "Shadows danced in the corners of forgotten rooms.",
+                "Time flowed like a river, never pausing for reflection.",
+                "The artist's brush captured the soul of the moment.",
+                "Whispers of the past echoed through the empty halls.",
+                "Dreams took flight on wings of imagination.",
+                "The melody wove itself into the fabric of the night."
+            ],
+            formal: [
+                "The committee concluded that further investigation was warranted.",
+                "Statistical analysis revealed a significant correlation between the variables.",
+                "The methodology employed in this study followed established protocols.",
+                "Results indicated a marked improvement in performance metrics.",
+                "The hypothesis was supported by empirical evidence gathered during the experiment.",
+                "A comprehensive review of the literature revealed several gaps in current research.",
+                "The framework provides a structured approach to problem-solving.",
+                "Implementation of the proposed solution yielded positive outcomes.",
+                "The data suggests a need for revised strategies moving forward.",
+                "Conclusions drawn from the analysis have practical implications for the industry."
+            ],
+            poetic: [
+                "Golden sunlight filtered through the canopy of ancient oaks.",
+                "The moon cast silver threads upon the still, dark water.",
+                "Petals fell like whispered promises in the gentle breeze.",
+                "Horizons stretched endlessly toward dreams yet unrealized.",
+                "The symphony of rain played softly on the windowpane.",
+                "Shadows lengthened as day surrendered to approaching night.",
+                "Memories bloomed like flowers in the garden of the mind.",
+                "The river of time carved canyons through the landscape of memory.",
+                "Stars were scattered like diamonds on velvet darkness.",
+                "The silence between heartbeats held unspoken truths."
+            ],
+            technical: [
+                "The algorithm efficiently processes large datasets through parallel computation.",
+                "Optimization of parameters resulted in a 15% performance increase.",
+                "The neural network architecture consists of multiple convolutional layers.",
+                "Data normalization ensured consistent input scaling across features.",
+                "The system employs a feedback loop for continuous improvement.",
+                "Encryption protocols safeguard sensitive information during transmission.",
+                "The model achieved 92% accuracy on the validation dataset.",
+                "Resource allocation follows a priority-based scheduling algorithm.",
+                "Error correction mechanisms maintain data integrity throughout processing.",
+                "The interface provides intuitive access to complex functionality."
+            ]
+        };
+
+        // Text generation function using template-based approach with Markov-like elements
+        function generateText(prompt, length, temperature, style) {
+            // Set RNG seed based on prompt for reproducibility
+            let seed = 0;
+            for (let i = 0; i < prompt.length; i++) {
+                seed = (seed * 31 + prompt.charCodeAt(i)) % 2**32;
+            }
+            rng = new SeededRNG(seed || Date.now());
+            
+            const sentences = textCorpus[style] || textCorpus.creative;
+            const numSentences = length === 'short' ? 2 : length === 'medium' ? 4 : 6;
+            
+            let result = prompt ? `${prompt}. ` : '';
+            
+            for (let i = 0; i < numSentences; i++) {
+                // With higher temperature, we're more likely to pick random sentences
+                // With lower temperature, we try to create more coherent sequences
+                if (temperature > 0.7 || i === 0) {
+                    result += rng.randomChoice(sentences);
+                } else {
+                    // Simple "Markov-like" behavior - find a sentence that shares words with previous one
+                    const lastSentence = result.split('. ').slice(-1)[0];
+                    const lastWords = lastSentence.split(' ').slice(-2);
+                    
+                    const matchingSentences = sentences.filter(s => 
+                        lastWords.some(word => 
+                            s.toLowerCase().includes(word.toLowerCase())
+                        )
+                    );
+                    
+                    if (matchingSentences.length > 0 && Math.random() < temperature) {
+                        result += rng.randomChoice(matchingSentences);
+                    } else {
+                        result += rng.randomChoice(sentences);
+                    }
+                }
+                
+                if (i < numSentences - 1) {
+                    result += '. ';
+                } else {
+                    result += '.';
+                }
+            }
+            
+            return result;
+        }
+
+        function initTextGenerator() {
+            const generateBtn = document.getElementById('textGenerate');
+            const randomizeBtn = document.getElementById('textRandomize');
+            const resetBtn = document.getElementById('textReset');
+            const exportBtn = document.getElementById('textExport');
+            const copyBtn = document.getElementById('textCopy');
+            const tempSlider = document.getElementById('textTemperature');
+            const tempValue = document.getElementById('tempValue');
+            
+            // Update temperature value display
+            tempSlider.addEventListener('input', () => {
+                tempValue.textContent = tempSlider.value;
+            });
+            
+            // Generate text
+            generateBtn.addEventListener('click', () => {
+                const prompt = document.getElementById('textPrompt').value;
+                const length = document.getElementById('textLength').value;
+                const temperature = parseFloat(document.getElementById('textTemperature').value);
+                const style = document.getElementById('textStyle').value;
+                const output = document.getElementById('textOutput');
+                
+                animateProgress('textProgress', 1500, () => {
+                    const generatedText = generateText(prompt, length, temperature, style);
+                    typewriterEffect(output, generatedText, 30);
+                });
+            });
+            
+            // Randomize parameters
+            randomizeBtn.addEventListener('click', () => {
+                const prompts = [
+                    "A mysterious door appeared in the ancient wall",
+                    "The algorithm discovered a pattern no one had seen before",
+                    "Whispers echoed through the digital void",
+                    "Light danced on the surface of the quantum field",
+                    "Memories of a future that never was"
+                ];
+                
+                document.getElementById('textPrompt').value = rng.randomChoice(prompts);
+                document.getElementById('textLength').value = rng.randomChoice(['short', 'medium', 'long']);
+                document.getElementById('textTemperature').value = (0.3 + rng.next() * 0.7).toFixed(1);
+                document.getElementById('textStyle').value = rng.randomChoice(['creative', 'formal', 'poetic', 'technical']);
+                
+                // Update temperature display
+                tempValue.textContent = document.getElementById('textTemperature').value;
+            });
+            
+            // Reset to defaults
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('textPrompt').value = '';
+                document.getElementById('textLength').value = 'medium';
+                document.getElementById('textTemperature').value = '0.7';
+                document.getElementById('textStyle').value = 'creative';
+                document.getElementById('textOutput').textContent = 'Your generated text will appear here...';
+                
+                // Update temperature display
+                tempValue.textContent = '0.7';
+            });
+            
+            // Export text
+            exportBtn.addEventListener('click', () => {
+                const text = document.getElementById('textOutput').textContent;
+                if (text && text !== 'Your generated text will appear here...') {
+                    downloadHelpers.text(text, 'aiplayground-text.txt');
+                    showConfetti();
+                }
+            });
+            
+            // Copy to clipboard
+            copyBtn.addEventListener('click', () => {
+                const text = document.getElementById('textOutput').textContent;
+                if (text && text !== 'Your generated text will appear here...') {
+                    navigator.clipboard.writeText(text).then(() => {
+                        // Visual feedback
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<span>Copied!</span>';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    });
+                }
+            });
+        }
+
+        // ===========================================================================
+        // IMAGE GENERATOR
+        // ===========================================================================
+
+        // Image generation using Canvas API and procedural algorithms
+        class ImageGenerator {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.width = this.canvas.width;
+                this.height = this.canvas.height;
+                this.isAnimating = false;
+                this.animationId = null;
+                this.gallery = [];
+            }
+
+            // Generate abstract noise pattern
+            generateNoise(colors, complexity) {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // Create gradient background
+                const gradient = this.ctx.createLinearGradient(0, 0, this.width, this.height);
+                gradient.addColorStop(0, this.getColor(colors, 0));
+                gradient.addColorStop(1, this.getColor(colors, 1));
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                // Add noise layers based on complexity
+                for (let i = 0; i < complexity * 10; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        rng.randomBetween(0, this.width),
+                        rng.randomBetween(0, this.height),
+                        rng.randomBetween(2, 20),
+                        0,
+                        Math.PI * 2
+                    );
+                    this.ctx.fillStyle = this.getColor(colors, i % 3);
+                    this.ctx.globalAlpha = rng.randomBetween(0.1, 0.3);
+                    this.ctx.fill();
+                }
+                
+                this.ctx.globalAlpha = 1.0;
+            }
+
+            // Generate line flow pattern
+            generateLineFlow(colors, complexity) {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // Background
+                this.ctx.fillStyle = this.getColor(colors, 0);
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                // Create flowing lines
+                const numLines = complexity * 2;
+                const points = [];
+                
+                // Generate random points
+                for (let i = 0; i < numLines; i++) {
+                    points.push({
+                        x: rng.randomBetween(0, this.width),
+                        y: rng.randomBetween(0, this.height),
+                        vx: rng.randomBetween(-2, 2),
+                        vy: rng.randomBetween(-2, 2)
+                    });
+                }
+                
+                // Draw connecting lines
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = this.getColor(colors, 1);
+                this.ctx.globalAlpha = 0.7;
+                
+                for (let i = 0; i < points.length; i++) {
+                    for (let j = i + 1; j < points.length; j++) {
+                        const dx = points[i].x - points[j].x;
+                        const dy = points[i].y - points[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 150) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(points[i].x, points[i].y);
+                            this.ctx.lineTo(points[j].x, points[j].y);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+                
+                this.ctx.globalAlpha = 1.0;
+            }
+
+            // Generate mosaic pattern
+            generateMosaic(colors, complexity) {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                const tileSize = Math.max(10, 100 / complexity);
+                const cols = Math.ceil(this.width / tileSize);
+                const rows = Math.ceil(this.height / tileSize);
+                
+                for (let x = 0; x < cols; x++) {
+                    for (let y = 0; y < rows; y++) {
+                        this.ctx.fillStyle = this.getColor(colors, (x + y) % 3);
+                        
+                        // Add some variation to tile size
+                        const sizeVariation = tileSize * rng.randomBetween(0.8, 1.2);
+                        const xPos = x * tileSize + (tileSize - sizeVariation) / 2;
+                        const yPos = y * tileSize + (tileSize - sizeVariation) / 2;
+                        
+                        this.ctx.fillRect(xPos, yPos, sizeVariation, sizeVariation);
+                    }
+                }
+            }
+
+            // Generate particle system
+            generateParticles(colors, complexity) {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // Background
+                this.ctx.fillStyle = this.getColor(colors, 0);
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                const numParticles = complexity * 20;
+                const particles = [];
+                
+                // Initialize particles
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push({
+                        x: rng.randomBetween(0, this.width),
+                        y: rng.randomBetween(0, this.height),
+                        vx: rng.randomBetween(-1, 1),
+                        vy: rng.randomBetween(-1, 1),
+                        radius: rng.randomBetween(1, 5),
+                        color: this.getColor(colors, i % 3)
+                    });
+                }
+                
+                // Animation function
+                const animate = () => {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                    this.ctx.fillRect(0, 0, this.width, this.height);
+                    
+                    particles.forEach(particle => {
+                        // Update position
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        
+                        // Bounce off walls
+                        if (particle.x < 0 || particle.x > this.width) particle.vx *= -1;
+                        if (particle.y < 0 || particle.y > this.height) particle.vy *= -1;
+                        
+                        // Draw particle
+                        this.ctx.beginPath();
+                        this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                        this.ctx.fillStyle = particle.color;
+                        this.ctx.fill();
+                    });
+                    
+                    if (this.isAnimating) {
+                        this.animationId = requestAnimationFrame(animate);
+                    }
+                };
+                
+                // Start animation
+                this.isAnimating = true;
+                animate();
+            }
+
+            // Get color based on palette and index
+            getColor(palette, index) {
+                const palettes = {
+                    vibrant: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                    pastel: ['#a5b4fc', '#6ee7b7', '#fcd34d', '#fca5a5', '#d8b4fe'],
+                    monochrome: ['#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af'],
+                    earth: ['#a16207', '#854d0e', '#713f12', '#fef3c7', '#fde68a']
+                };
+                
+                const colors = palettes[palette] || palettes.vibrant;
+                return colors[index % colors.length];
+            }
+
+            // Generate image based on parameters
+            generate(style, colors, complexity, seed) {
+                // Set RNG seed if provided
+                if (seed) {
+                    let seedValue = 0;
+                    for (let i = 0; i < seed.length; i++) {
+                        seedValue = (seedValue * 31 + seed.charCodeAt(i)) % 2**32;
+                    }
+                    rng = new SeededRNG(seedValue);
+                } else {
+                    rng = new SeededRNG(Date.now());
+                }
+                
+                // Stop any ongoing animation
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.isAnimating = false;
+                }
+                
+                // Generate based on style
+                switch (style) {
+                    case 'abstract':
+                        this.generateNoise(colors, complexity);
+                        break;
+                    case 'flow':
+                        this.generateLineFlow(colors, complexity);
+                        break;
+                    case 'mosaic':
+                        this.generateMosaic(colors, complexity);
+                        break;
+                    case 'particles':
+                        this.generateParticles(colors, complexity);
+                        break;
+                    default:
+                        this.generateNoise(colors, complexity);
+                }
+                
+                // Add to gallery
+                this.addToGallery();
+            }
+
+            // Add current canvas to gallery
+            addToGallery() {
+                const dataURL = this.canvas.toDataURL();
+                this.gallery.push(dataURL);
+                
+                // Update gallery display
+                this.updateGallery();
+                
+                // Keep only last 6 images
+                if (this.gallery.length > 6) {
+                    this.gallery.shift();
+                }
+            }
+
+            // Update gallery UI
+            updateGallery() {
+                const galleryEl = document.getElementById('imageGallery');
+                galleryEl.innerHTML = '';
+                
+                this.gallery.forEach((imgSrc, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `<img src="${imgSrc}" alt="Generated image ${index + 1}">`;
+                    
+                    item.addEventListener('click', () => {
+                        // Redraw the selected image on the main canvas
+                        const img = new Image();
+                        img.onload = () => {
+                            this.ctx.clearRect(0, 0, this.width, this.height);
+                            this.ctx.drawImage(img, 0, 0, this.width, this.height);
+                        };
+                        img.src = imgSrc;
+                    });
+                    
+                    galleryEl.appendChild(item);
+                });
+            }
+
+            // Pause/resume animation
+            toggleAnimation() {
+                this.isAnimating = !this.isAnimating;
+                
+                if (this.isAnimating) {
+                    // For particles, we need to restart the animation
+                    const style = document.getElementById('imageStyle').value;
+                    if (style === 'particles') {
+                        const colors = document.getElementById('imageColors').value;
+                        const complexity = parseInt(document.getElementById('imageComplexity').value);
+                        this.generateParticles(colors, complexity);
+                    }
+                } else if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                
+                return this.isAnimating;
+            }
+        }
+
+        function initImageGenerator() {
+            const generator = new ImageGenerator('imageCanvas');
+            const generateBtn = document.getElementById('imageGenerate');
+            const randomizeBtn = document.getElementById('imageRandomize');
+            const resetBtn = document.getElementById('imageReset');
+            const exportBtn = document.getElementById('imageExport');
+            const pauseBtn = document.getElementById('imagePause');
+            const complexitySlider = document.getElementById('imageComplexity');
+            const complexityValue = document.getElementById('complexityValue');
+            
+            // Update complexity value display
+            complexitySlider.addEventListener('input', () => {
+                complexityValue.textContent = complexitySlider.value;
+            });
+            
+            // Generate image
+            generateBtn.addEventListener('click', () => {
+                const style = document.getElementById('imageStyle').value;
+                const colors = document.getElementById('imageColors').value;
+                const complexity = parseInt(document.getElementById('imageComplexity').value);
+                const seed = document.getElementById('imageSeed').value;
+                
+                animateProgress('imageProgress', 2000, () => {
+                    generator.generate(style, colors, complexity, seed);
+                });
+            });
+            
+            // Randomize parameters
+            randomizeBtn.addEventListener('click', () => {
+                document.getElementById('imageStyle').value = rng.randomChoice(['abstract', 'flow', 'mosaic', 'particles']);
+                document.getElementById('imageColors').value = rng.randomChoice(['vibrant', 'pastel', 'monochrome', 'earth']);
+                document.getElementById('imageComplexity').value = rng.randomBetween(3, 8).toFixed(0);
+                document.getElementById('imageSeed').value = Math.random().toString(36).substring(2, 10);
+                
+                // Update complexity display
+                complexityValue.textContent = document.getElementById('imageComplexity').value;
+            });
+            
+            // Reset to defaults
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('imageStyle').value = 'abstract';
+                document.getElementById('imageColors').value = 'vibrant';
+                document.getElementById('imageComplexity').value = '5';
+                document.getElementById('imageSeed').value = '';
+                
+                // Update complexity display
+                complexityValue.textContent = '5';
+                
+                // Clear canvas
+                generator.ctx.clearRect(0, 0, generator.width, generator.height);
+                generator.gallery = [];
+                generator.updateGallery();
+            });
+            
+            // Export image
+            exportBtn.addEventListener('click', () => {
+                downloadHelpers.canvas(generator.canvas, 'aiplayground-image.png');
+                showConfetti();
+            });
+            
+            // Pause/resume animation
+            pauseBtn.addEventListener('click', () => {
+                const isAnimating = generator.toggleAnimation();
+                pauseBtn.innerHTML = isAnimating ? '<span>Pause Animation</span>' : '<span>Resume Animation</span>';
+            });
+            
+            // Generate initial image
+            generator.generate('abstract', 'vibrant', 5);
+        }
+
+        // ===========================================================================
+        // SOUND SYNTHESIZER
+        // ===========================================================================
+
+        // Sound synthesizer using Web Audio API
+        class SoundSynthesizer {
+            constructor(visualizerId) {
+                this.audioContext = null;
+                this.isPlaying = false;
+                this.currentSequence = null;
+                this.visualizerCanvas = document.getElementById(visualizerId);
+                this.visualizerCtx = this.visualizerCanvas.getContext('2d');
+                this.analyser = null;
+                this.dataArray = null;
+                this.animationId = null;
+                
+                // Initialize audio context on user interaction
+                this.initializeAudioContext();
+            }
+
+            // Initialize audio context (requires user interaction)
+            initializeAudioContext() {
+                document.getElementById('soundPlay').addEventListener('click', () => {
+                    if (!this.audioContext) {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        this.setupAnalyser();
+                    }
+                });
+            }
+
+            // Setup audio analyser for visualization
+            setupAnalyser() {
+                this.analyser = this.audioContext.createAnalyser();
+                this.analyser.fftSize = 256;
+                const bufferLength = this.analyser.frequencyBinCount;
+                this.dataArray = new Uint8Array(bufferLength);
+            }
+
+            // Generate musical sequence based on parameters
+            generateSequence(scale, tempo, waveform, duration, seed) {
+                // Set RNG seed if provided
+                if (seed) {
+                    let seedValue = 0;
+                    for (let i = 0; i < seed.length; i++) {
+                        seedValue = (seedValue * 31 + seed.charCodeAt(i)) % 2**32;
+                    }
+                    rng = new SeededRNG(seedValue);
+                } else {
+                    rng = new SeededRNG(Date.now());
+                }
+                
+                // Define scales (MIDI note numbers)
+                const scales = {
+                    major: [0, 2, 4, 5, 7, 9, 11], // C major scale intervals
+                    minor: [0, 2, 3, 5, 7, 8, 10], // C minor scale intervals
+                    pentatonic: [0, 2, 4, 7, 9],   // C major pentatonic
+                    chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] // All notes
+                };
+                
+                const selectedScale = scales[scale] || scales.major;
+                const baseNote = 60; // Middle C
+                const notes = selectedScale.map(interval => baseNote + interval);
+                
+                // Generate note sequence
+                const sequence = [];
+                const numBeats = duration * 4; // 4 beats per bar
+                
+                for (let i = 0; i < numBeats; i++) {
+                    // Determine if this beat should have a note (70% chance)
+                    if (rng.next() < 0.7) {
+                        sequence.push({
+                            note: rng.randomChoice(notes),
+                            duration: 0.5, // Half note
+                            time: i * (60 / tempo) // Time in seconds
+                        });
+                    } else {
+                        sequence.push(null); // Rest
+                    }
+                }
+                
+                this.currentSequence = {
+                    notes: sequence,
+                    tempo: tempo,
+                    waveform: waveform,
+                    duration: duration
+                };
+                
+                return sequence;
+            }
+
+            // Play the generated sequence
+            async playSequence() {
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.setupAnalyser();
+                }
+                
+                if (this.audioContext.state === 'suspended') {
+                    await this.audioContext.resume();
+                }
+                
+                if (!this.currentSequence) {
+                    console.log('No sequence generated yet');
+                    return;
+                }
+                
+                this.isPlaying = true;
+                const startTime = this.audioContext.currentTime;
+                const sequence = this.currentSequence;
+                
+                // Connect analyser for visualization
+                if (this.analyser) {
+                    this.visualize();
+                }
+                
+                // Play each note in the sequence
+                sequence.notes.forEach((noteData, index) => {
+                    if (noteData) {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.analyser);
+                        this.analyser.connect(this.audioContext.destination);
+                        
+                        oscillator.type = sequence.waveform;
+                        oscillator.frequency.setValueAtTime(
+                            this.midiToFrequency(noteData.note),
+                            startTime + noteData.time
+                        );
+                        
+                        // ADSR envelope
+                        gainNode.gain.setValueAtTime(0, startTime + noteData.time);
+                        gainNode.gain.linearRampToValueAtTime(
+                            0.5,
+                            startTime + noteData.time + 0.05
+                        );
+                        gainNode.gain.exponentialRampToValueAtTime(
+                            0.01,
+                            startTime + noteData.time + noteData.duration
+                        );
+                        
+                        oscillator.start(startTime + noteData.time);
+                        oscillator.stop(startTime + noteData.time + noteData.duration);
+                    }
+                });
+                
+                // Stop after sequence duration
+                const totalDuration = sequence.notes.length * (60 / sequence.tempo);
+                setTimeout(() => {
+                    this.stop();
+                }, totalDuration * 1000);
+            }
+
+            // Stop playback
+            stop() {
+                this.isPlaying = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                
+                // Clear visualizer
+                this.visualizerCtx.clearRect(0, 0, this.visualizerCanvas.width, this.visualizerCanvas.height);
+            }
+
+            // Convert MIDI note to frequency
+            midiToFrequency(note) {
+                return 440 * Math.pow(2, (note - 69) / 12);
+            }
+
+            // Visualize audio using analyser
+            visualize() {
+                if (!this.analyser || !this.isPlaying) return;
+                
+                this.animationId = requestAnimationFrame(() => this.visualize());
+                
+                this.analyser.getByteFrequencyData(this.dataArray);
+                
+                const width = this.visualizerCanvas.width;
+                const height = this.visualizerCanvas.height;
+                const barWidth = (width / this.dataArray.length) * 2.5;
+                
+                this.visualizerCtx.clearRect(0, 0, width, height);
+                
+                let x = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    const barHeight = (this.dataArray[i] / 255) * height;
+                    
+                    const gradient = this.visualizerCtx.createLinearGradient(0, height - barHeight, 0, height);
+                    gradient.addColorStop(0, '#6366f1');
+                    gradient.addColorStop(1, '#10b981');
+                    
+                    this.visualizerCtx.fillStyle = gradient;
+                    this.visualizerCtx.fillRect(x, height - barHeight, barWidth, barHeight);
+                    
+                    x += barWidth + 1;
+                }
+            }
+        }
+
+        function initSoundSynthesizer() {
+            const synthesizer = new SoundSynthesizer('soundVisualizer');
+            const generateBtn = document.getElementById('soundGenerate');
+            const randomizeBtn = document.getElementById('soundRandomize');
+            const resetBtn = document.getElementById('soundReset');
+            const exportBtn = document.getElementById('soundExport');
+            const playBtn = document.getElementById('soundPlay');
+            const stopBtn = document.getElementById('soundStop');
+            const tempoSlider = document.getElementById('soundTempo');
+            const tempoValue = document.getElementById('tempoValue');
+            const durationSlider = document.getElementById('soundDuration');
+            const durationValue = document.getElementById('durationValue');
+            
+            // Update tempo value display
+            tempoSlider.addEventListener('input', () => {
+                tempoValue.textContent = tempoSlider.value;
+            });
+            
+            // Update duration value display
+            durationSlider.addEventListener('input', () => {
+                durationValue.textContent = durationSlider.value;
+            });
+            
+            // Generate sequence
+            generateBtn.addEventListener('click', () => {
+                const scale = document.getElementById('soundScale').value;
+                const tempo = parseInt(document.getElementById('soundTempo').value);
+                const waveform = document.getElementById('soundWaveform').value;
+                const duration = parseInt(document.getElementById('soundDuration').value);
+                
+                animateProgress('soundProgress', 1000, () => {
+                    synthesizer.generateSequence(scale, tempo, waveform, duration);
+                });
+            });
+            
+            // Randomize parameters
+            randomizeBtn.addEventListener('click', () => {
+                document.getElementById('soundScale').value = rng.randomChoice(['major', 'minor', 'pentatonic', 'chromatic']);
+                document.getElementById('soundTempo').value = rng.randomBetween(60, 160).toFixed(0);
+                document.getElementById('soundWaveform').value = rng.randomChoice(['sine', 'square', 'sawtooth', 'triangle']);
+                document.getElementById('soundDuration').value = rng.randomBetween(2, 16).toFixed(0);
+                
+                // Update displays
+                tempoValue.textContent = document.getElementById('soundTempo').value;
+                durationValue.textContent = document.getElementById('soundDuration').value;
+            });
+            
+            // Reset to defaults
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('soundScale').value = 'major';
+                document.getElementById('soundTempo').value = '120';
+                document.getElementById('soundWaveform').value = 'sine';
+                document.getElementById('soundDuration').value = '8';
+                
+                // Update displays
+                tempoValue.textContent = '120';
+                durationValue.textContent = '8';
+                
+                // Stop any playing audio
+                synthesizer.stop();
+            });
+            
+            // Export audio (simplified - in a real implementation, we would record and encode)
+            exportBtn.addEventListener('click', () => {
+                // For a full implementation, we would:
+                // 1. Record the audio output during playback
+                // 2. Encode it as WAV
+                // 3. Offer it for download
+                alert('Audio export would be implemented in a full version. For now, please use browser audio recording tools.');
+                showConfetti();
+            });
+            
+            // Play sequence
+            playBtn.addEventListener('click', () => {
+                if (!synthesizer.currentSequence) {
+                    // Generate a sequence if none exists
+                    const scale = document.getElementById('soundScale').value;
+                    const tempo = parseInt(document.getElementById('soundTempo').value);
+                    const waveform = document.getElementById('soundWaveform').value;
+                    const duration = parseInt(document.getElementById('soundDuration').value);
+                    
+                    synthesizer.generateSequence(scale, tempo, waveform, duration);
+                }
+                
+                synthesizer.playSequence();
+            });
+            
+            // Stop playback
+            stopBtn.addEventListener('click', () => {
+                synthesizer.stop();
+            });
+            
+            // Generate initial sequence
+            synthesizer.generateSequence('major', 120, 'sine', 8);
+        }
+
+        // ===========================================================================
+        // INITIALIZATION
+        // ===========================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initNavigation();
+            initTextGenerator();
+            initImageGenerator();
+            initSoundSynthesizer();
+            
+            // Add fallback for older browsers
+            if (!HTMLCanvasElement.prototype.toBlob) {
+                console.warn('Canvas toBlob not supported - image export may not work in this browser');
+            }
+            
+            if (!window.AudioContext && !window.webkitAudioContext) {
+                alert('Web Audio API is not supported in this browser. The sound synthesizer will not work.');
+            }
+        });
+    </script>
+</body>
+</html>
